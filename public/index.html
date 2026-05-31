@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Praia Segura SC</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <h1>🌊 Praia Segura SC</h1>
+      <p>Consulte pontos próprios e impróprios para banho em Santa Catarina com dados do IMA.</p>
+    </div>
+
+    <div class="controls">
+      <input id="search" type="search" placeholder="Buscar praia, cidade ou ponto..." />
+      <select id="filter">
+        <option value="TODAS">Todas</option>
+        <option value="PRÓPRIO">Somente próprias</option>
+        <option value="IMPRÓPRIO">Somente impróprias</option>
+      </select>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary">
+      <div class="box">
+        <strong id="total">0</strong>
+        <span>pontos carregados</span>
+      </div>
+      <div class="box green">
+        <strong id="proprias">0</strong>
+        <span>próprios</span>
+      </div>
+      <div class="box red">
+        <strong id="improprias">0</strong>
+        <span>impróprios</span>
+      </div>
+      <div class="box">
+        <strong id="updated">--</strong>
+        <span>atualização</span>
+      </div>
+    </section>
+
+    <section id="map"></section>
+
+    <p id="status" class="status">Carregando dados reais...</p>
+
+    <section id="cards" class="cards"></section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
