@@ -1,7 +1,7 @@
 {
   "name": "praia-segura-sc-v3",
   "version": "1.0.0",
-  "description": "Site com frontend + backend Node.js para consultar balneabilidade das praias de Santa Catarina.",
+  "description": "Site com Node.js de consulta da balneabilidade das praias de Santa Catarina.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
