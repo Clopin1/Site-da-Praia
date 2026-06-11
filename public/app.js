@@ -112,7 +112,7 @@ function renderCards(lista) {
         <div><strong>Local:</strong> ${p.localizacao || "Não informado"}</div>
         <div><strong>Data:</strong> ${p.data || "Não informada"}</div>
         <div><strong>Chuva:</strong> ${p.chuva || "Não informado"}</div>
-        <div><strong>Resultado:</strong> ${p.resultado || "Não informado"}</div>
+        <div><strong>Nivel de E. Coli:</strong> ${p.resultado || "Não informado"}</div>
         <div><strong>Temp. água:</strong> ${p.tempAgua || "Não informado"}</div>
       </div>
     `;
