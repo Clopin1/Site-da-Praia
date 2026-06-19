@@ -1,6 +1,19 @@
+
+/* =================================================
+   CONFIGURAÇÕES GERAIS DA PÁGINA
+
+   Remove espaçamentos padrão do navegador
+   e define o comportamento do box model.
+================================================= */
 * {
   box-sizing: border-box;
 }
+
+/* =================================================
+   ESTILIZAÇÃO GLOBAL DA APLICAÇÃO
+
+   Define fonte, cor do texto e plano de fundo.
+================================================= */
 
 body {
   margin: 0;
@@ -9,6 +22,9 @@ body {
   color: #172033;
 }
 
+/* =================================================
+   TEXTO DESCRITIVO DO CABEÇALHO
+================================================= */
 .hero {
   background: linear-gradient(135deg, #0f5fb8, #1684d8);
   color: white;
@@ -25,12 +41,23 @@ body {
   opacity: 0.95;
 }
 
+/* =================================================
+   CONTROLES DE PESQUISA E FILTRO
+
+   Organiza os campos de busca e seleção.
+================================================= */
 .controls {
   display: grid;
   grid-template-columns: 1fr 220px;
   gap: 12px;
 }
 
+/* =================================================
+   CAMPOS DE FORMULÁRIO
+
+   Estilização dos elementos de entrada
+   utilizados pelo usuário.
+================================================= */
 input,
 select {
   border: none;
@@ -39,12 +66,22 @@ select {
   font-size: 16px;
 }
 
+/* =================================================
+   CONTAINER PRINCIPAL
+
+   Limita a largura máxima da aplicação.
+================================================= */
 main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 18px;
 }
 
+/* =================================================
+   RESUMO ESTATÍSTICO
+
+   Exibe os indicadores gerais do sistema.
+================================================= */
 .summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -52,6 +89,11 @@ main {
   margin-bottom: 16px;
 }
 
+/* =================================================
+   CARTÕES DOS INDICADORES
+
+   Exibem totais, atualizações e estatísticas.
+================================================= */
 .box {
   background: white;
   border-radius: 16px;
@@ -64,14 +106,25 @@ main {
   font-size: 26px;
 }
 
+/* =================================================
+   INDICADOR DE PRAIAS PRÓPRIAS
+================================================= */
 .green strong {
   color: #15803d;
 }
 
+/* =================================================
+   INDICADOR DE PRAIAS IMPRÓPRIAS
+================================================= */
 .red strong {
   color: #b91c1c;
 }
 
+/* =================================================
+   MAPA INTERATIVO
+
+   Define tamanho e aparência do mapa Leaflet.
+================================================= */
 #map {
   height: 460px;
   border-radius: 18px;
@@ -80,17 +133,33 @@ main {
   margin-bottom: 16px;
 }
 
+/* =================================================
+   ÁREA DE STATUS
+
+   Exibe mensagens de carregamento e erros.
+================================================= */
 .status {
   font-weight: bold;
   margin: 12px 0;
 }
 
+/* =================================================
+   LISTA DE CARDS
+
+   Organiza os cartões das praias em grade.
+================================================= */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
   gap: 14px;
 }
 
+/* =================================================
+   CARD DE PRAIA
+
+   Exibe as informações detalhadas de um ponto
+   monitorado pelo IMA.
+================================================= */
 .card {
   background: white;
   border-radius: 18px;
@@ -99,10 +168,16 @@ main {
   border-left: 8px solid #64748b;
 }
 
+/* =================================================
+   CARD DE PRAIA PRÓPRIA
+================================================= */
 .card.proprio {
   border-left-color: #16a34a;
 }
 
+/* =================================================
+   CARD DE PRAIA IMPRÓPRIA
+================================================= */
 .card.improprio {
   border-left-color: #dc2626;
 }
@@ -115,6 +190,12 @@ main {
   color: #64748b;
 }
 
+/* =================================================
+   BADGES DE CLASSIFICAÇÃO
+
+   Utilizados para destacar visualmente
+   a condição de balneabilidade.
+================================================= */
 .badge {
   display: inline-block;
   margin: 10px 0;
@@ -138,6 +219,11 @@ main {
   line-height: 1.5;
 }
 
+/* =================================================
+   RESPONSIVIDADE
+
+   Ajusta a interface para dispositivos móveis.
+================================================= */
 @media (max-width: 720px) {
   .controls,
   .summary {

@@ -1,11 +1,33 @@
+/**
+ * Endpoint utilizado pelo frontend para obter os dados
+ * processados pelo servidor backend.
+ */
 const API = "/api/praias";
 
+/**
+ * Armazena os dados utilizados pelo frontend.
+ *
+ * praias:
+ * Lista completa recebida do backend.
+ *
+ * filtradas:
+ * Lista resultante após aplicação de filtros.
+ *
+ * markers:
+ * Marcadores atualmente exibidos no mapa.
+ */
 const state = {
   praias: [],
   filtradas: [],
   markers: []
 };
 
+/**
+ * Referências para os elementos da interface.
+ *
+ * Permite manipular os componentes da página
+ * sem realizar múltiplas buscas no DOM.
+ */
 const els = {
   search: document.getElementById("search"),
   filter: document.getElementById("filter"),
@@ -17,13 +39,23 @@ const els = {
   updated: document.getElementById("updated")
 };
 
+/**
+ * Cria o mapa principal utilizando Leaflet.
+ *
+ * O mapa é centralizado inicialmente no litoral
+ * de Santa Catarina.
+ */
 const map = L.map("map").setView([-27.4, -48.7], 8);
+
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap"
 }).addTo(map);
 
+/**
+ * Ícone utilizado para praias próprias.
+ */
 const greenIcon = L.divIcon({
   className: "custom-marker",
   html: "🟢",
@@ -31,6 +63,9 @@ const greenIcon = L.divIcon({
   iconAnchor: [12, 12]
 });
 
+/**
+ * Ícone utilizado para praias impróprias.
+ */
 const redIcon = L.divIcon({
   className: "custom-marker",
   html: "🔴",
@@ -38,10 +73,22 @@ const redIcon = L.divIcon({
   iconAnchor: [12, 12]
 });
 
+/**
+ * Verifica se uma praia está própria para banho.
+ *
+ * @param {Object} praia Praia analisada.
+ * @returns {boolean}
+ */
 function isPropria(praia) {
   return praia.condicao && praia.condicao.toUpperCase().includes("PRÓPRIO") && !praia.condicao.toUpperCase().includes("IMPRÓPRIO");
 }
 
+/**
+ * Verifica se uma praia está imprópria para banho.
+ *
+ * @param {Object} praia Praia analisada.
+ * @returns {boolean}
+ */
 function isImpropria(praia) {
   return praia.condicao && praia.condicao.toUpperCase().includes("IMPRÓPRIO");
 }
@@ -51,6 +98,14 @@ function formatarDataHora(iso) {
   return new Date(iso).toLocaleString("pt-BR");
 }
 
+/**
+ * Atualiza os indicadores exibidos na página.
+ *
+ * Exibe:
+ * - Total de pontos
+ * - Quantidade de pontos próprios
+ * - Quantidade de pontos impróprios
+ */
 function resumo() {
   const proprias = state.praias.filter(isPropria).length;
   const improprias = state.praias.filter(isImpropria).length;
@@ -60,11 +115,20 @@ function resumo() {
   els.improprias.textContent = improprias;
 }
 
+/**
+ * Remove todos os marcadores atualmente
+ * exibidos no mapa.
+ */
 function limparMarcadores() {
   state.markers.forEach(marker => marker.remove());
   state.markers = [];
 }
 
+/**
+ * Cria os marcadores das praias no mapa.
+ *
+ * @param {Array} lista Lista de praias a serem exibidas.
+ */
 function renderMapa(lista) {
   limparMarcadores();
 
@@ -85,6 +149,18 @@ function renderMapa(lista) {
   });
 }
 
+/**
+ * Gera os cartões de informação das praias.
+ *
+ * Cada cartão apresenta:
+ * - Nome da praia
+ * - Município
+ * - Condição
+ * - Data da análise
+ * - Informações complementares
+ *
+ * @param {Array} lista Lista de praias.
+ */
 function renderCards(lista) {
   els.cards.innerHTML = "";
 
@@ -126,6 +202,11 @@ function renderCards(lista) {
   });
 }
 
+/**
+ * Realiza a pesquisa textual e aplica
+ * os filtros de condição selecionados
+ * pelo usuário.
+ */
 function aplicarFiltros() {
   const termo = els.search.value.trim().toLowerCase();
   const filtro = els.filter.value;
@@ -147,6 +228,16 @@ function aplicarFiltros() {
   renderMapa(state.filtradas);
 }
 
+/**
+ * Carrega os dados do backend.
+ *
+ * Fluxo:
+ * 1. Consulta a API local.
+ * 2. Recebe os dados normalizados.
+ * 3. Atualiza os indicadores.
+ * 4. Atualiza o mapa.
+ * 5. Atualiza a lista de praias.
+ */
 async function carregarPraias() {
   try {
     els.status.textContent = "Carregando dados reais do IMA...";
@@ -173,7 +264,19 @@ async function carregarPraias() {
   }
 }
 
+/**
+ * Evento disparado quando o usuário
+ * digita no campo de pesquisa.
+ */
 els.search.addEventListener("input", aplicarFiltros);
+
+/**
+ * Evento disparado quando o usuário
+ * altera o filtro de condição.
+ */
 els.filter.addEventListener("change", aplicarFiltros);
 
+/**
+ * Inicia o carregamento inicial da aplicação.
+ */
 carregarPraias();

@@ -1,24 +1,77 @@
+<!--
+  Define o tipo de documento HTML5.
+-->
 <!DOCTYPE html>
+
+<!--
+  Elemento raiz da página.
+  O atributo lang="pt-BR" indica que o conteúdo está em português do Brasil.
+-->
 <html lang="pt-BR">
 
+<!--
+  Cabeçalho técnico da página.
+  Contém configurações, título e importação de arquivos externos.
+-->
 <head>
+  <!--
+  Define a codificação de caracteres para UTF-8,
+  permitindo o uso correto de acentos e caracteres especiais.
+-->
   <meta charset="UTF-8" />
+  
+  <!--
+  Configura a página para se adaptar a diferentes tamanhos de tela,
+  como celulares, tablets e computadores.
+-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Praia no Ponto</title>
+  
+  <!--
+  Importa o CSS da biblioteca Leaflet,
+  necessário para a exibição correta do mapa interativo.
+-->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!--
+  Importa o arquivo CSS próprio do projeto,
+  responsável pela aparência visual da aplicação.
+-->
   <link rel="stylesheet" href="style.css" />
 </head>
 
+<!--
+  Corpo da página.
+  Contém todos os elementos visíveis ao usuário.
+-->
 <body>
   <header class="hero">
     <div>
-      <h1>📍 Praia no Ponto 📍</h1>
+      <h1>Ponto Seguro 📍</h1>
+      
+      <!--
+  Descrição curta do objetivo do sistema.
+-->
       <p>Consulte pontos próprios e impróprios para banho em Santa Catarina com dados do IMA.</p>
     </div>
 
+    <!--
+  Área de controles da interface.
+  Contém o campo de pesquisa e o seletor de filtro.
+-->
     <div class="controls">
+      
+      <!--
+  Campo de pesquisa utilizado para buscar praias, municípios ou pontos.
+  O JavaScript acessa este elemento pelo id="search".
+-->
       <input id="search" type="search" placeholder="Buscar praia, cidade ou ponto..." />
       
+      <!--
+  Filtro utilizado para selecionar quais condições serão exibidas.
+  O JavaScript acessa este elemento pelo id="filter".
+--> 
       <select id="filter">
         <option value="TODAS">Todas</option>
         <option value="PRÓPRIO">Somente próprias</option>
@@ -31,21 +84,34 @@
   <main>
     <section class="summary">
 
+      <!--
+  Exibe o total de pontos carregados.
+  O valor é atualizado pelo app.js.
+-->
       <div class="box">
         <strong id="total">0</strong>
         <span>pontos carregados</span>
       </div>
 
+      <!--
+  Exibe a quantidade de pontos próprios para banho.
+-->
       <div class="box green">
         <strong id="proprias">0</strong>
         <span>próprios</span>
       </div>
 
+      <!--
+  Exibe a quantidade de pontos impróprios para banho.
+-->
       <div class="box red">
         <strong id="improprias">0</strong>
         <span>impróprios</span>
       </div>
 
+      <!--
+  Exibe a data e hora da última atualização dos dados.
+-->
       <div class="box">
         <strong id="updated">--</strong>
         <span>atualização</span>
@@ -53,14 +119,32 @@
 
     </section>
 
+    <!--
+  Seção onde o mapa interativo será renderizado pela biblioteca Leaflet.
+-->
     <section id="map"></section>
 
+    <!--
+  Parágrafo usado para informar o status do carregamento dos dados.
+-->
     <p id="status" class="status">Carregando dados reais...</p>
 
+    <!--
+  Seção onde os cards das praias serão inseridos dinamicamente pelo app.js.
+-->
     <section id="cards" class="cards"></section>
   </main>
 
+  <!--
+  Importa a biblioteca JavaScript do Leaflet,
+  responsável pelas funcionalidades do mapa.
+-->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!--
+  Importa o arquivo JavaScript principal do projeto,
+  responsável por carregar dados, criar cards, aplicar filtros e atualizar o mapa.
+-->
   <script src="app.js"></script>
 </body>
 
