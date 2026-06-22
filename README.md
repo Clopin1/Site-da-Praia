@@ -7,7 +7,7 @@
 
 **Nome do Projeto:** Praia Segura SC
 
-**Desenvolvedor:** Rafael da Silva Corrêa
+**Desenvolvedor:** Rafael da Silva Corrêa e Isabella Trento Lohn
 
 **Curso:** Análise e Desenvolvimento de Sistemas
 
