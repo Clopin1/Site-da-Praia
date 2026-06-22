@@ -1,3 +1,6 @@
+# Link para o site: https://praia-segura-sc.onrender.com
+
+
 # PRAIA SEGURA SC
 
 ## 1. Identificação do Projeto
