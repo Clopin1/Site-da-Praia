@@ -1,155 +1,150 @@
-<!--
-  Define o tipo de documento HTML5.
--->
 <!DOCTYPE html>
-
 <!--
-  Elemento raiz da página.
-  O atributo lang="pt-BR" indica que o conteúdo está em português do Brasil.
+  Documento HTML principal da aplicação Ponto Seguro.
+  Define a estrutura da interface exibida ao usuário.
 -->
 <html lang="pt-BR">
-
-<!--
-  Cabeçalho técnico da página.
-  Contém configurações, título e importação de arquivos externos.
--->
 <head>
-  <!--
-  Define a codificação de caracteres para UTF-8,
-  permitindo o uso correto de acentos e caracteres especiais.
--->
+  <!-- Define a codificação de caracteres para suportar acentos e símbolos. -->
   <meta charset="UTF-8" />
-  
-  <!--
-  Configura a página para se adaptar a diferentes tamanhos de tela,
-  como celulares, tablets e computadores.
--->
+
+  <!-- Garante adaptação da interface em celulares, tablets e computadores. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Praia no Ponto</title>
-  
-  <!--
-  Importa o CSS da biblioteca Leaflet,
-  necessário para a exibição correta do mapa interativo.
--->
+
+  <!-- Título exibido na aba do navegador. -->
+  <title>Ponto Seguro</title>
+
+  <!-- Importação da fonte Inter, utilizada para melhorar a identidade visual. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS da biblioteca Leaflet, necessária para o funcionamento visual do mapa. -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <!--
-  Importa o arquivo CSS próprio do projeto,
-  responsável pela aparência visual da aplicação.
--->
+
+  <!-- CSS próprio da aplicação. -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<!--
-  Corpo da página.
-  Contém todos os elementos visíveis ao usuário.
--->
 <body>
+  <!--
+    Cabeçalho principal.
+    Contém o nome do sistema, descrição, fonte dos dados e filtros.
+  -->
   <header class="hero">
-    <div>
-      <h1> 📍 Ponto Seguro </h1>
-      
-      <!--
-  Descrição curta do objetivo do sistema.
--->
-      <p>Consulte pontos próprios e impróprios para banho em Santa Catarina com dados do IMA.</p>
+    <div class="hero-content">
+      <div>
+        <span class="eyebrow">Monitoramento ambiental</span>
+        <h1>📍 Ponto Seguro</h1>
+        <p>
+          Consulte a balneabilidade das praias de Santa Catarina com dados oficiais do IMA.
+        </p>
+      </div>
+
+      <!-- Cartão informativo sobre a origem dos dados. -->
+      <div class="source-card">
+        <span>Fonte dos dados</span>
+        <strong>IMA/SC</strong>
+        <small>Atualização automática via API</small>
+      </div>
     </div>
 
     <!--
-  Área de controles da interface.
-  Contém o campo de pesquisa e o seletor de filtro.
--->
+      Área de controles.
+      O JavaScript utiliza estes campos para pesquisar e filtrar os dados.
+    -->
     <div class="controls">
-      
-      <!--
-  Campo de pesquisa utilizado para buscar praias, municípios ou pontos.
-  O JavaScript acessa este elemento pelo id="search".
--->
-      <input id="search" type="search" placeholder="Buscar praia, cidade ou ponto..." />
-      
-      <select id="cityFilter">
-        <option value="TODAS">Todos os municípios</option>
-      </select>
-      
-      <!--
-  Filtro utilizado para selecionar quais condições serão exibidas.
-  O JavaScript acessa este elemento pelo id="filter".
---> 
-      <select id="filter">
-        <option value="TODAS">Todas</option>
-        <option value="PRÓPRIO">Somente próprias</option>
-        <option value="IMPRÓPRIO">Somente impróprias</option>
-      </select>
+      <label class="field search-field">
+        <span>Buscar</span>
+        <input id="search" type="search" placeholder="Praia, município ou ponto..." />
+      </label>
 
+      <label class="field">
+        <span>Município</span>
+        <select id="cityFilter">
+          <option value="TODAS">Todos os municípios</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Situação</span>
+        <select id="filter">
+          <option value="TODAS">Todas</option>
+          <option value="PRÓPRIO">Somente próprias</option>
+          <option value="IMPRÓPRIO">Somente impróprias</option>
+        </select>
+      </label>
     </div>
   </header>
 
   <main>
-    <section class="summary">
-
-      <!--
-  Exibe o total de pontos carregados.
-  O valor é atualizado pelo app.js.
--->
+    <!--
+      Indicadores gerais do sistema.
+      Os valores são preenchidos dinamicamente pelo app.js.
+    -->
+    <section class="summary" aria-label="Resumo dos pontos monitorados">
       <div class="box">
+        <span class="box-icon">🌊</span>
         <strong id="total">0</strong>
-        <span>pontos carregados</span>
+        <span>Pontos monitorados</span>
       </div>
 
-      <!--
-  Exibe a quantidade de pontos próprios para banho.
--->
       <div class="box green">
+        <span class="box-icon">🟢</span>
         <strong id="proprias">0</strong>
-        <span>próprios</span>
+        <span>Próprios</span>
       </div>
 
-      <!--
-  Exibe a quantidade de pontos impróprios para banho.
--->
       <div class="box red">
+        <span class="box-icon">🔴</span>
         <strong id="improprias">0</strong>
-        <span>impróprios</span>
+        <span>Impróprios</span>
       </div>
 
-      <!--
-  Exibe a data e hora da última atualização dos dados.
--->
       <div class="box">
+        <span class="box-icon">📅</span>
         <strong id="updated">--</strong>
-        <span>atualização</span>
+        <span>Última atualização</span>
       </div>
-
     </section>
 
-    <!--
-  Seção onde o mapa interativo será renderizado pela biblioteca Leaflet.
--->
-    <section id="map"></section>
+    <!-- Área do mapa interativo. -->
+    <section class="map-card">
+      <div class="section-title">
+        <div>
+          <span>Mapa interativo</span>
+          <h2>Pontos de balneabilidade</h2>
+        </div>
 
-    <!--
-  Parágrafo usado para informar o status do carregamento dos dados.
--->
+        <!-- Legenda visual dos marcadores do mapa. -->
+        <div class="legend">
+          <span><i class="dot green-dot"></i> Própria</span>
+          <span><i class="dot red-dot"></i> Imprópria</span>
+        </div>
+      </div>
+
+      <!-- Elemento onde o Leaflet renderiza o mapa. -->
+      <div id="map"></div>
+    </section>
+
+    <!-- Mensagem de carregamento, erro ou quantidade de resultados. -->
     <p id="status" class="status">Carregando dados reais...</p>
 
-    <!--
-  Seção onde os cards das praias serão inseridos dinamicamente pelo app.js.
--->
+    <!-- Área onde os cards das praias são inseridos dinamicamente. -->
     <section id="cards" class="cards"></section>
   </main>
 
-  <!--
-  Importa a biblioteca JavaScript do Leaflet,
-  responsável pelas funcionalidades do mapa.
--->
+  <!-- Rodapé informativo da aplicação. -->
+  <footer class="footer">
+    <strong>📍 Ponto Seguro</strong>
+    <span>Projeto acadêmico desenvolvido para consulta de dados públicos de balneabilidade.</span>
+    <span>Dados fornecidos pelo Instituto do Meio Ambiente de Santa Catarina (IMA).</span>
+  </footer>
+
+  <!-- Biblioteca Leaflet. -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
-  <!--
-  Importa o arquivo JavaScript principal do projeto,
-  responsável por carregar dados, criar cards, aplicar filtros e atualizar o mapa.
--->
+
+  <!-- Arquivo JavaScript principal da aplicação. -->
   <script src="app.js"></script>
 </body>
-
 </html>

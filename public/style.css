@@ -1,240 +1,470 @@
+/* ============================================================
+   PONTO SEGURO - ESTILIZAÇÃO PRINCIPAL
+   ============================================================
 
-/* =================================================
-   CONFIGURAÇÕES GERAIS DA PÁGINA
+   Este arquivo define a aparência visual da aplicação, incluindo:
+   - Paleta de cores
+   - Cabeçalho
+   - Campos de filtro
+   - Indicadores
+   - Mapa
+   - Cards
+   - Responsividade
+*/
 
-   Remove espaçamentos padrão do navegador
-   e define o comportamento do box model.
-================================================= */
+/* Variáveis globais de cores e medidas. */
+:root {
+  --ocean: #005c97;
+  --ocean-light: #00a8cc;
+  --sand: #f8f5f0;
+  --background: #f5f7fa;
+  --text: #263238;
+  --muted: #64748b;
+  --card: #ffffff;
+  --green: #2e7d32;
+  --green-soft: #e8f5e9;
+  --red: #c62828;
+  --red-soft: #ffebee;
+  --shadow: 0 18px 45px rgba(15, 42, 66, 0.12);
+  --radius: 22px;
+}
+
+/* Reset básico do box model. */
 * {
   box-sizing: border-box;
 }
 
-/* =================================================
-   ESTILIZAÇÃO GLOBAL DA APLICAÇÃO
-
-   Define fonte, cor do texto e plano de fundo.
-================================================= */
-
+/* Estilo geral do corpo da página. */
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f3f7fb;
-  color: #172033;
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(0, 168, 204, 0.12), transparent 32rem),
+    var(--background);
+  color: var(--text);
 }
 
-/* =================================================
-   TEXTO DESCRITIVO DO CABEÇALHO
-================================================= */
+/* Cabeçalho principal com identidade visual oceânica. */
 .hero {
-  background: linear-gradient(135deg, #0f5fb8, #1684d8);
+  background: linear-gradient(135deg, rgba(0, 92, 151, 0.98), rgba(0, 168, 204, 0.9));
   color: white;
-  padding: 28px;
+  padding: 34px 28px 30px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -55px;
+  height: 110px;
+  background: rgba(255, 255, 255, 0.13);
+  border-radius: 50%;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .hero h1 {
-  margin: 0 0 8px;
-  font-size: 34px;
+  margin: 0 0 10px;
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .hero p {
-  margin: 0 0 22px;
-  opacity: 0.95;
+  margin: 0;
+  max-width: 720px;
+  font-size: 18px;
+  opacity: 0.96;
+  line-height: 1.55;
 }
 
-/* =================================================
-   CONTROLES DE PESQUISA E FILTRO
+.source-card {
+  min-width: 210px;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
 
-   Organiza os campos de busca e seleção.
-================================================= */
+.source-card span,
+.source-card small {
+  display: block;
+  opacity: 0.88;
+}
+
+.source-card strong {
+  display: block;
+  margin: 6px 0;
+  font-size: 28px;
+}
+
+/* Área dos filtros e campo de busca. */
 .controls {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 220px 220px;
-  gap: 12px;
+  grid-template-columns: 1fr 240px 220px;
+  gap: 14px;
 }
 
-/* =================================================
-   CAMPOS DE FORMULÁRIO
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  font-weight: 700;
+}
 
-   Estilização dos elementos de entrada
-   utilizados pelo usuário.
-================================================= */
 input,
 select {
+  width: 100%;
   border: none;
-  border-radius: 14px;
-  padding: 14px;
-  font-size: 16px;
+  outline: none;
+  border-radius: 16px;
+  padding: 15px 16px;
+  font: inherit;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
 }
 
-/* =================================================
-   CONTAINER PRINCIPAL
-
-   Limita a largura máxima da aplicação.
-================================================= */
+/* Container principal do conteúdo. */
 main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 18px;
+  padding: 26px 18px 38px;
 }
 
-/* =================================================
-   RESUMO ESTATÍSTICO
-
-   Exibe os indicadores gerais do sistema.
-================================================= */
+/* Grade dos indicadores superiores. */
 .summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-/* =================================================
-   CARTÕES DOS INDICADORES
-
-   Exibem totais, atualizações e estatísticas.
-================================================= */
+/* Cartões de resumo estatístico. */
 .box {
-  background: white;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(15, 42, 66, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.box:hover,
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 55px rgba(15, 42, 66, 0.16);
+}
+
+.box-icon {
+  display: block;
+  font-size: 26px;
+  margin-bottom: 12px;
 }
 
 .box strong {
   display: block;
-  font-size: 26px;
+  font-size: 30px;
+  line-height: 1;
+  margin-bottom: 7px;
+  color: var(--ocean);
 }
 
-/* =================================================
-   INDICADOR DE PRAIAS PRÓPRIAS
-================================================= */
+.box span:last-child {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .green strong {
-  color: #15803d;
+  color: var(--green);
 }
 
-/* =================================================
-   INDICADOR DE PRAIAS IMPRÓPRIAS
-================================================= */
 .red strong {
-  color: #b91c1c;
+  color: var(--red);
 }
 
-/* =================================================
-   MAPA INTERATIVO
-
-   Define tamanho e aparência do mapa Leaflet.
-================================================= */
-#map {
-  height: 460px;
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+/* Card que envolve o mapa interativo. */
+.map-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(15, 42, 66, 0.06);
   margin-bottom: 16px;
 }
 
-/* =================================================
-   ÁREA DE STATUS
-
-   Exibe mensagens de carregamento e erros.
-================================================= */
-.status {
-  font-weight: bold;
-  margin: 12px 0;
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 
-/* =================================================
-   LISTA DE CARDS
+.section-title span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
 
-   Organiza os cartões das praias em grade.
-================================================= */
+.section-title h2 {
+  margin: 4px 0 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  background: var(--sand);
+  border-radius: 999px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.green-dot {
+  background: var(--green);
+}
+
+.red-dot {
+  background: var(--red);
+}
+
+/* Tamanho e aparência do mapa Leaflet. */
+#map {
+  height: 470px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 42, 66, 0.08);
+}
+
+.custom-marker {
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.26));
+}
+
+.leaflet-tooltip.ponto-tooltip {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 12px 28px rgba(15, 42, 66, 0.18);
+  color: var(--text);
+  font-family: "Inter", Arial, sans-serif;
+  line-height: 1.45;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(15, 42, 66, 0.18);
+}
+
+.leaflet-popup-content {
+  font-family: "Inter", Arial, sans-serif;
+  line-height: 1.55;
+}
+
+.popup-title {
+  font-weight: 800;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.status {
+  font-weight: 800;
+  color: var(--ocean);
+  margin: 18px 4px;
+}
+
+/* Grade que organiza os cards dos pontos monitorados. */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+  gap: 16px;
 }
 
-/* =================================================
-   CARD DE PRAIA
-
-   Exibe as informações detalhadas de um ponto
-   monitorado pelo IMA.
-================================================= */
+/* Card individual de cada praia ou ponto monitorado. */
 .card {
-  background: white;
-  border-radius: 18px;
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  border-left: 8px solid #64748b;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(15, 42, 66, 0.06);
+  border-left: 8px solid var(--ocean);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* =================================================
-   CARD DE PRAIA PRÓPRIA
-================================================= */
 .card.proprio {
-  border-left-color: #16a34a;
+  border-left-color: var(--green);
 }
 
-/* =================================================
-   CARD DE PRAIA IMPRÓPRIA
-================================================= */
 .card.improprio {
-  border-left-color: #dc2626;
+  border-left-color: var(--red);
 }
 
 .card h3 {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
+  font-size: 19px;
+  letter-spacing: -0.02em;
 }
 
 .muted {
-  color: #64748b;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
 }
 
-/* =================================================
-   BADGES DE CLASSIFICAÇÃO
-
-   Utilizados para destacar visualmente
-   a condição de balneabilidade.
-================================================= */
 .badge {
-  display: inline-block;
-  margin: 10px 0;
-  padding: 7px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 14px 0;
+  padding: 8px 12px;
   border-radius: 999px;
-  font-weight: bold;
+  font-weight: 800;
+  font-size: 14px;
 }
 
 .badge.proprio {
-  background: #dcfce7;
-  color: #15803d;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .badge.improprio {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+/* Indicador visual da confiabilidade recente das análises. */
+.confidence {
+  margin: 4px 0 14px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--sand);
+}
+
+.confidence-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+}
+
+.confidence-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--ocean-light), var(--green));
 }
 
 .details {
+  display: grid;
+  gap: 8px;
   font-size: 14px;
   line-height: 1.5;
 }
 
-/* =================================================
-   RESPONSIVIDADE
+.detail-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
 
-   Ajusta a interface para dispositivos móveis.
-================================================= */
-@media (max-width: 720px) {
+/* Rodapé informativo do sistema. */
+.footer {
+  margin-top: 18px;
+  padding: 28px 18px;
+  text-align: center;
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 42, 66, 0.08);
+}
+
+.footer strong {
+  color: var(--ocean);
+  font-size: 18px;
+}
+
+/* Ajustes responsivos para telas menores. */
+@media (max-width: 880px) {
+  .hero-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .controls,
   .summary {
     grid-template-columns: 1fr;
   }
 
-  .hero h1 {
-    font-size: 27px;
+  .section-title {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   #map {
-    height: 360px;
+    height: 370px;
   }
 }
