@@ -22,6 +22,17 @@ const state = {
   markers: []
 };
 
+function carregarMunicipios() {
+  const municipios = [...new Set(state.praias.map(p => p.municipio))].sort();
+
+  municipios.forEach(municipio => {
+    const option = document.createElement("option");
+    option.value = municipio;
+    option.textContent = municipio;
+    els.cityFilter.appendChild(option);
+  });
+}
+
 /**
  * Referências para os elementos da interface.
  *
@@ -31,6 +42,7 @@ const state = {
 const els = {
   search: document.getElementById("search"),
   filter: document.getElementById("filter"),
+  cityFilter: document.getElementById("cityFilter"),
   cards: document.getElementById("cards"),
   status: document.getElementById("status"),
   total: document.getElementById("total"),
@@ -210,6 +222,7 @@ function renderCards(lista) {
 function aplicarFiltros() {
   const termo = els.search.value.trim().toLowerCase();
   const filtro = els.filter.value;
+  const cidadeSelecionada = els.cityFilter.value;
 
   state.filtradas = state.praias.filter(p => {
     const texto = `${p.balneario} ${p.municipio} ${p.ponto} ${p.localizacao}`.toLowerCase();
@@ -220,7 +233,9 @@ function aplicarFiltros() {
       (filtro === "PRÓPRIO" && isPropria(p)) ||
       (filtro === "IMPRÓPRIO" && isImpropria(p));
 
-    return bateTexto && bateStatus;
+    const bateCidade =
+      cidadeSelecionada === "TODAS" || p.municipio === cidadeSelecionada;
+    return bateTexto && bateStatus && bateCidade;
   });
 
   els.status.textContent = `${state.filtradas.length} ponto(s) exibido(s).`;
@@ -256,6 +271,7 @@ async function carregarPraias() {
     els.status.textContent = `${state.praias.length} pontos carregados do IMA.`;
 
     resumo();
+    carregarMunicipios();
     renderCards(state.praias);
     renderMapa(state.praias);
   } catch (erro) {
