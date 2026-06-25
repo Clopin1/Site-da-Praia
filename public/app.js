@@ -14,35 +14,14 @@
  * - Calcular a confiabilidade recente das análises.
  */
 
-/**
- * Endpoint local do backend.
- *
- * O frontend não acessa diretamente o IMA. Ele consulta o backend,
- * que busca os dados no endpoint oficial e os devolve normalizados.
- *
- * @constant {string}
- */
 const API = "/api/praias";
 
-/**
- * Estado central da aplicação.
- *
- * @property {Array} praias Lista completa recebida da API.
- * @property {Array} filtradas Lista exibida após filtros.
- * @property {Array} markers Marcadores atualmente exibidos no mapa.
- */
 const state = {
   praias: [],
   filtradas: [],
-  markers: []
+  limiteCards: 120
 };
 
-/**
- * Referências aos elementos HTML utilizados pela interface.
- *
- * Concentrar essas referências em um único objeto evita chamadas
- * repetidas ao document.getElementById ao longo do código.
- */
 const els = {
   search: document.getElementById("search"),
   filter: document.getElementById("filter"),
@@ -55,124 +34,60 @@ const els = {
   updated: document.getElementById("updated")
 };
 
-/**
- * Cria o mapa principal usando a biblioteca Leaflet.
- *
- * A posição inicial foi definida para Santa Catarina.
- */
-const map = L.map("map").setView([-27.4, -48.7], 8);
+const map = L.map("map", { preferCanvas: true }).setView([-27.4, -48.7], 8);
 
-/**
- * Adiciona a camada visual do OpenStreetMap ao mapa.
- */
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap"
 }).addTo(map);
 
-/**
- * Ícone usado para pontos próprios para banho.
- */
-const greenIcon = L.divIcon({
-  className: "custom-marker",
-  html: "🟢",
-  iconSize: [24, 24],
-  iconAnchor: [12, 12]
+const clusterGroup = L.markerClusterGroup({
+  chunkedLoading: true,
+  chunkInterval: 80,
+  chunkDelay: 30,
+  maxClusterRadius: 45,
+  disableClusteringAtZoom: 14,
+  spiderfyOnMaxZoom: true,
+  showCoverageOnHover: false
 });
 
-/**
- * Ícone usado para pontos impróprios para banho.
- */
-const redIcon = L.divIcon({
-  className: "custom-marker",
-  html: "🔴",
-  iconSize: [24, 24],
-  iconAnchor: [12, 12]
-});
+map.addLayer(clusterGroup);
 
-/**
- * Verifica se o ponto está classificado como próprio.
- *
- * A verificação impede que a palavra "IMPRÓPRIO" seja confundida
- * com "PRÓPRIO", pois uma contém a outra.
- *
- * @param {Object} praia Objeto com os dados do ponto monitorado.
- * @returns {boolean} Verdadeiro quando o ponto está próprio.
- */
+let filtroTimer = null;
+
 function isPropria(praia) {
   return praia.condicao &&
     praia.condicao.toUpperCase().includes("PRÓPRIO") &&
     !praia.condicao.toUpperCase().includes("IMPRÓPRIO");
 }
 
-/**
- * Verifica se o ponto está classificado como impróprio.
- *
- * @param {Object} praia Objeto com os dados do ponto monitorado.
- * @returns {boolean} Verdadeiro quando o ponto está impróprio.
- */
 function isImpropria(praia) {
   return praia.condicao &&
     praia.condicao.toUpperCase().includes("IMPRÓPRIO");
 }
 
-/**
- * Formata data e hora em formato brasileiro.
- *
- * @param {string} iso Data em formato ISO.
- * @returns {string} Data formatada para pt-BR.
- */
 function formatarDataHora(iso) {
   if (!iso) return "--";
   return new Date(iso).toLocaleString("pt-BR");
 }
 
-/**
- * Calcula a confiabilidade recente do ponto monitorado.
- *
- * O cálculo considera as últimas cinco análises disponíveis e verifica
- * quantas ficaram abaixo de 800 NMP/100mL de E. coli.
- *
- * Importante: este indicador é informativo e não substitui a
- * classificação oficial do IMA.
- *
- * @param {Object} praia Objeto com dados do ponto monitorado.
- * @returns {{total: number, adequadas: number}} Resultado do cálculo.
- */
 function calcularConfiabilidade(praia) {
   const ultimas = Array.isArray(praia.analises) ? praia.analises.slice(0, 5) : [];
-
   const adequadas = ultimas.filter(analise => {
     const resultado = Number(String(analise.RESULTADO || "").replace(",", "."));
     return Number.isFinite(resultado) && resultado < 800;
   }).length;
-
-  return {
-    total: ultimas.length,
-    adequadas
-  };
+  return { total: ultimas.length, adequadas };
 }
 
-/**
- * Atualiza os indicadores superiores da interface.
- */
 function resumo() {
-  const proprias = state.praias.filter(isPropria).length;
-  const improprias = state.praias.filter(isImpropria).length;
-
   els.total.textContent = state.praias.length;
-  els.proprias.textContent = proprias;
-  els.improprias.textContent = improprias;
+  els.proprias.textContent = state.praias.filter(isPropria).length;
+  els.improprias.textContent = state.praias.filter(isImpropria).length;
 }
 
-/**
- * Preenche automaticamente o filtro de municípios.
- *
- * Os municípios são extraídos da lista de pontos carregados pela API.
- */
 function carregarMunicipios() {
   els.cityFilter.innerHTML = '<option value="TODAS">Todos os municípios</option>';
-
   const municipios = [...new Set(state.praias.map(p => p.municipio))]
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b, "pt-BR"));
@@ -185,23 +100,6 @@ function carregarMunicipios() {
   });
 }
 
-/**
- * Remove todos os marcadores do mapa.
- *
- * Essa função é usada antes de desenhar os pontos novamente,
- * principalmente após a aplicação de filtros.
- */
-function limparMarcadores() {
-  state.markers.forEach(marker => marker.remove());
-  state.markers = [];
-}
-
-/**
- * Cria o conteúdo do tooltip exibido ao passar o mouse sobre o marcador.
- *
- * @param {Object} p Ponto monitorado.
- * @returns {string} HTML do tooltip.
- */
 function criarTooltip(p) {
   return `
     <strong>📍 ${p.balneario}</strong><br>
@@ -211,15 +109,8 @@ function criarTooltip(p) {
   `;
 }
 
-/**
- * Cria o conteúdo do popup exibido ao clicar em um marcador.
- *
- * @param {Object} p Ponto monitorado.
- * @returns {string} HTML do popup.
- */
 function criarPopup(p) {
   const confiabilidade = calcularConfiabilidade(p);
-
   return `
     <div class="popup-title">📍 ${p.balneario}</div>
     <div>🏙 ${p.municipio}</div>
@@ -234,48 +125,32 @@ function criarPopup(p) {
   `;
 }
 
-/**
- * Renderiza os marcadores no mapa.
- *
- * Cada ponto recebe:
- * - Ícone verde ou vermelho.
- * - Tooltip ao passar o mouse.
- * - Popup detalhado ao clicar.
- *
- * @param {Array} lista Lista de pontos monitorados.
- */
-function renderMapa(lista) {
-  limparMarcadores();
-
-  lista.forEach(p => {
-    const marker = L.marker([p.latitude, p.longitude], {
-      icon: isImpropria(p) ? redIcon : greenIcon
-    })
-      .addTo(map)
-      .bindTooltip(criarTooltip(p), {
-        direction: "top",
-        opacity: 0.96,
-        sticky: true,
-        className: "ponto-tooltip"
-      })
-      .bindPopup(criarPopup(p));
-
-    state.markers.push(marker);
+function criarMarcador(p) {
+  const cor = isImpropria(p) ? "#c62828" : "#2e7d32";
+  const marcador = L.circleMarker([p.latitude, p.longitude], {
+    radius: 7,
+    color: "#ffffff",
+    weight: 2,
+    fillColor: cor,
+    fillOpacity: 0.95
   });
+
+  marcador.bindTooltip(criarTooltip(p), {
+    direction: "top",
+    opacity: 0.96,
+    sticky: false,
+    className: "ponto-tooltip"
+  });
+
+  marcador.bindPopup(criarPopup(p));
+  return marcador;
 }
 
-/**
- * Renderiza os cards dos pontos monitorados.
- *
- * Os cards exibem:
- * - Nome do balneário.
- * - Município.
- * - Condição.
- * - Indicador de confiabilidade recente.
- * - Dados da análise mais recente.
- *
- * @param {Array} lista Lista de pontos monitorados.
- */
+function renderMapa(lista) {
+  clusterGroup.clearLayers();
+  clusterGroup.addLayers(lista.map(criarMarcador));
+}
+
 function renderCards(lista) {
   els.cards.innerHTML = "";
 
@@ -284,7 +159,17 @@ function renderCards(lista) {
     return;
   }
 
-  lista.forEach(p => {
+  const fragment = document.createDocumentFragment();
+  const listaLimitada = lista.slice(0, state.limiteCards);
+
+  if (lista.length > state.limiteCards) {
+    const aviso = document.createElement("p");
+    aviso.className = "status";
+    aviso.textContent = `Exibindo ${state.limiteCards} de ${lista.length} cards. Use os filtros para refinar a busca.`;
+    fragment.appendChild(aviso);
+  }
+
+  listaLimitada.forEach(p => {
     const card = document.createElement("article");
     const propria = isPropria(p);
     const impropria = isImpropria(p);
@@ -298,11 +183,9 @@ function renderCards(lista) {
     card.innerHTML = `
       <h3>📍 ${p.balneario}</h3>
       <p class="muted">🏙 ${p.municipio}${p.ponto ? " • " + p.ponto : ""}</p>
-
       <span class="badge ${impropria ? "improprio" : "proprio"}">
         ${impropria ? "🔴 Imprópria" : "🟢 Própria para banho"}
       </span>
-
       <div class="confidence">
         <div class="confidence-label">
           <span>Confiabilidade recente</span>
@@ -312,7 +195,6 @@ function renderCards(lista) {
           <div class="confidence-fill" style="width: ${porcentagem}%"></div>
         </div>
       </div>
-
       <div class="details">
         <div class="detail-row"><span>📌</span><div><strong>Local:</strong> ${p.localizacao || "Não informado"}</div></div>
         <div class="detail-row"><span>📅</span><div><strong>Data:</strong> ${p.data || "Não informada"}</div></div>
@@ -322,9 +204,6 @@ function renderCards(lista) {
       </div>
     `;
 
-    /**
-     * Ao clicar no card, o mapa é centralizado no ponto correspondente.
-     */
     card.addEventListener("click", () => {
       map.setView([p.latitude, p.longitude], 14);
       window.scrollTo({
@@ -333,18 +212,12 @@ function renderCards(lista) {
       });
     });
 
-    els.cards.appendChild(card);
+    fragment.appendChild(card);
   });
+
+  els.cards.appendChild(fragment);
 }
 
-/**
- * Aplica os filtros da interface.
- *
- * Filtros disponíveis:
- * - Texto digitado na busca.
- * - Município selecionado.
- * - Situação própria/imprópria.
- */
 function aplicarFiltros() {
   const termo = els.search.value.trim().toLowerCase();
   const filtro = els.filter.value;
@@ -352,10 +225,8 @@ function aplicarFiltros() {
 
   state.filtradas = state.praias.filter(p => {
     const texto = `${p.balneario} ${p.municipio} ${p.ponto} ${p.localizacao}`.toLowerCase();
-
     const bateTexto = texto.includes(termo);
     const bateCidade = cidadeSelecionada === "TODAS" || p.municipio === cidadeSelecionada;
-
     const bateStatus =
       filtro === "TODAS" ||
       (filtro === "PRÓPRIO" && isPropria(p)) ||
@@ -365,26 +236,23 @@ function aplicarFiltros() {
   });
 
   els.status.textContent = `${state.filtradas.length} ponto(s) exibido(s).`;
-
   renderCards(state.filtradas);
   renderMapa(state.filtradas);
 }
 
-/**
- * Carrega os dados reais do backend e inicializa a interface.
- */
+function aplicarFiltrosComDebounce() {
+  clearTimeout(filtroTimer);
+  filtroTimer = setTimeout(aplicarFiltros, 250);
+}
+
 async function carregarPraias() {
   try {
     els.status.textContent = "Carregando dados reais do IMA...";
-
     const resposta = await fetch(API);
 
-    if (!resposta.ok) {
-      throw new Error(`Erro ${resposta.status}`);
-    }
+    if (!resposta.ok) throw new Error(`Erro ${resposta.status}`);
 
     const json = await resposta.json();
-
     state.praias = json.dados || [];
     state.filtradas = state.praias;
 
@@ -401,14 +269,8 @@ async function carregarPraias() {
   }
 }
 
-/**
- * Eventos de interação da interface.
- */
-els.search.addEventListener("input", aplicarFiltros);
+els.search.addEventListener("input", aplicarFiltrosComDebounce);
 els.filter.addEventListener("change", aplicarFiltros);
 els.cityFilter.addEventListener("change", aplicarFiltros);
 
-/**
- * Inicializa a aplicação.
- */
 carregarPraias();

@@ -468,3 +468,26 @@ main {
     height: 370px;
   }
 }
+
+/* ============================================================
+   OTIMIZAÇÕES VISUAIS DO MAPA
+============================================================ */
+
+.leaflet-interactive {
+  outline: none;
+}
+
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background-color: rgba(0, 92, 151, 0.18);
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background-color: var(--ocean);
+  color: white;
+  font-weight: 800;
+  font-family: "Inter", Arial, sans-serif;
+}
