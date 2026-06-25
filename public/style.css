@@ -291,7 +291,6 @@ main {
   display: grid;
   place-items: center;
   font-size: 22px;
-  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.26));
 }
 
 .leaflet-tooltip.ponto-tooltip {
