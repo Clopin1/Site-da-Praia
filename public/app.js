@@ -19,6 +19,7 @@ const API = "/api/praias";
 const state = {
   praias: [],
   filtradas: [],
+  markers: [],
   limiteCards: 120
 };
 
@@ -40,18 +41,24 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap"
 }).addTo(map);
+ 
+const greenIcon = L.divIcon({
 
-const clusterGroup = L.markerClusterGroup({
-  chunkedLoading: true,
-  chunkInterval: 80,
-  chunkDelay: 30,
-  maxClusterRadius: 45,
-  disableClusteringAtZoom: 14,
-  spiderfyOnMaxZoom: true,
-  showCoverageOnHover: false
+    className: "custom-marker",
+    html: "🟢",
+    iconSize: [24,24],
+    iconAnchor: [12,12]
+
 });
 
-map.addLayer(clusterGroup);
+const redIcon = L.divIcon({
+
+    className: "custom-marker",
+    html: "🔴",
+    iconSize: [24,24],
+    iconAnchor: [12,12]
+
+});
 
 let filtroTimer = null;
 
@@ -126,29 +133,66 @@ function criarPopup(p) {
 }
 
 function criarMarcador(p) {
-  const cor = isImpropria(p) ? "#c62828" : "#2e7d32";
-  const marcador = L.circleMarker([p.latitude, p.longitude], {
-    radius: 7,
-    color: "#ffffff",
-    weight: 2,
-    fillColor: cor,
-    fillOpacity: 0.95
-  });
 
-  marcador.bindTooltip(criarTooltip(p), {
-    direction: "top",
-    opacity: 0.96,
-    sticky: false,
-    className: "ponto-tooltip"
-  });
+    const marker = L.marker(
+        [p.latitude, p.longitude],
+        {
+            icon: isImpropria(p) ? redIcon : greenIcon
+        }
+    );
 
-  marcador.bindPopup(criarPopup(p));
-  return marcador;
+    marker.on("mouseover", () => {
+
+        marker.bindTooltip(criarTooltip(p), {
+            direction: "top",
+            opacity: 0.96,
+            sticky: false,
+            className: "ponto-tooltip"
+        });
+
+        marker.openTooltip();
+
+    });
+
+    marker.on("mouseout", () => {
+
+        marker.closeTooltip();
+        marker.unbindTooltip();
+
+    });
+
+    marker.on("click", () => {
+
+        if (!marker.getPopup()) {
+            marker.bindPopup(criarPopup(p));
+        }
+
+        marker.openPopup();
+
+    });
+
+    return marker;
+
 }
 
 function renderMapa(lista) {
-  clusterGroup.clearLayers();
-  clusterGroup.addLayers(lista.map(criarMarcador));
+
+    state.markers ??= [];
+
+    state.markers.forEach(marker => map.removeLayer(marker));
+
+    state.markers = [];
+
+    lista.forEach(p => {
+
+        const marker = criarMarcador(p);
+
+        marker.addTo(map);
+
+        state.markers.push(marker);
+
+    });
+
 }
 
 function renderCards(lista) {
